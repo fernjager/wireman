@@ -62,7 +62,7 @@ void setTxPin(Manchester *man, uint8_t pin)
 
 void setRxPin(Manchester *man, uint8_t pin)
 {
-  RxPin = man->RxPin = pin;
+  RxPin = pin;
   DIR &= ~pin;
 }
 
@@ -120,12 +120,6 @@ void setup(Manchester *man, uint8_t Tpin, uint8_t Rpin, uint8_t SF)
 {
   setupTransmit(man, Tpin, SF);
   setupReceive(man, Rpin, SF);
-}
-
-void transmit(Manchester *man, uint16_t data)
-{
-  uint8_t byteData[2] = {data >> 8, data & 0xFF};
-  transmitArray(man, 2, byteData);
 }
 
 /*
@@ -218,22 +212,10 @@ void beginReceiveArray(uint8_t maxBytes, uint8_t *data)
   MANRX_BeginReceiveBytes(maxBytes, data);
 }
 
-void beginReceive(void)
-{
-  MANRX_BeginReceive();
-}
-
 uint8_t receiveComplete(void)
 {
   return MANRX_ReceiveComplete();
 }
-
-
-uint16_t getMessage(void)
-{
-  return MANRX_GetMessage();
-}
-
 
 void stopReceive(void)
 {
@@ -273,13 +255,6 @@ void MANRX_SetupReceive(uint8_t speedFactor)
   TCNT1 = 0; // Set counter to 0
 } //end of setupReceive
 
-void MANRX_BeginReceive(void)
-{
-  rx_maxBytes = 2;
-  rx_data = rx_default_data;
-  rx_mode = RX_MODE_PRE;
-}
-
 void MANRX_BeginReceiveBytes(uint8_t maxBytes, uint8_t *data)
 {
   rx_maxBytes = maxBytes;
@@ -296,12 +271,6 @@ uint8_t MANRX_ReceiveComplete(void)
 {
   return (rx_mode == RX_MODE_MSG);
 }
-
-uint16_t MANRX_GetMessage(void)
-{
-  return (((int16_t)rx_data[0]) << 8) | (int16_t)rx_data[1];
-}
-
 
 void AddManBit(uint16_t *manBits, uint8_t *numMB,
                uint8_t *curByte, uint8_t *data,

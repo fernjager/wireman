@@ -92,15 +92,17 @@ allowing us to transmit even with up to 100% in clock speed difference
 #define RX_MODE_MSG 3
 #define RX_MODE_IDLE 4
 
+#define BUFFER_SIZE 100
+
 #define TimeOutDefault -1 //the timeout in msec, the default is to block
 
 typedef struct Manchester {
   uint8_t TxPin;
-  uint8_t RxPin;
   uint8_t applyWorkAround1Mhz;
   uint8_t speedFactor;
   uint16_t delay1;
   uint16_t delay2;
+  uint8_t addr;
 } Manchester;
 
 void setTxPin(Manchester*man, uint8_t pin);
