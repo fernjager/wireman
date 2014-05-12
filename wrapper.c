@@ -43,9 +43,10 @@ void send(Manchester* man, uint8_t to, uint8_t* data, uint8_t length){
   uint8_t buffer[BUFFER_SIZE];
   buffer[0] = to;
   buffer[1] = man->addr;
-  memcpy(buffer+4,data,length);
+  buffer[3] = length;
+  memcpy( buffer+4, data, length );
   buffer[length+4] = crc8(data, length);
-  transmitArray(man, length + 5, data);
+  transmitArray(man, length + 5, buffer);
 }
 
 
@@ -53,14 +54,17 @@ void send(Manchester* man, uint8_t to, uint8_t* data, uint8_t length){
 void recv(Manchester *man, uint8_t* target, uint8_t length){
   uint8_t buffer[BUFFER_SIZE];
   uint8_t done = 0;
-  beginReceiveArray(BUFFER_SIZE, buffer);
-  while(!receiveComplete() || done ){
 
+  while( !done ){
+    beginReceiveArray(length + 5, buffer);
+    while(!receiveComplete()){}
     // If this packet was intended for us
     // check to see if the packet is the right size we're expecting
     // crc check?
-    done = man->addr == buffer[0] && buffer[3] == length && crc8( buffer + 3, length ) == buffer[BUFFER_SIZE-1];
-    }
+
+    done = man->addr == buffer[0] && buffer[3] == length && crc8( buffer + 4, length ) == buffer[length + 4];
+  }
+  memcpy(target, buffer + 4, length);
 }
 
 
