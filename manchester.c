@@ -142,7 +142,7 @@ The receiver is then operating correctly and we have locked onto the transmissio
 void transmitArray(Manchester *man, uint8_t numBytes, uint8_t *data)
 {
   // Send 14 0's
-  for( int16_t i = 0; i < 14; i++) //send capture pulses
+  for( uint8_t i = 0; i < 14; i++) //send capture pulses
     sendZero(man); //end of capture pulses
  
   // Send a single 1
@@ -151,7 +151,7 @@ void transmitArray(Manchester *man, uint8_t numBytes, uint8_t *data)
   // Send the user data
   for (uint8_t i = 0; i < numBytes; i++)
   {
-    uint16_t mask = 0x01; //mask to send bits
+    uint8_t mask = 0x01; //mask to send bits
     uint8_t d = data[i] ^ DECOUPLING_MASK;
     for (uint8_t j = 0; j < 8; j++)
     {
@@ -167,7 +167,6 @@ void transmitArray(Manchester *man, uint8_t numBytes, uint8_t *data)
   sendZero(man);
   sendZero(man);
 }//end of send the data
-
 
 void sendZero(Manchester *man)
 {
@@ -187,26 +186,6 @@ void sendOne(Manchester *man)
   TPORT |= man->TxPin;
 }//end of send one
 
-//decode 8 bit payload and 4 bit ID from the message, return true if checksum is correct, otherwise false
-uint8_t decodeMessage(uint16_t m, uint8_t *id, uint8_t *data)
-{
-  //extract components
-  (*data) = (m & 0xFF);
-  (*id) = (m >> 12);
-  uint8_t ch = (m >> 8) & 0b1111; //checksum received
-  //calculate checksum
-  uint8_t ech = ((*id) ^ (*data) ^ ((*data) >> 4) ^ 0b0011) & 0b1111; //checksum expected
-  return ch == ech;
-}
-
-//encode 8 bit payload, 4 bit ID and 4 bit checksum into 16 bit
-uint16_t encodeMessage(uint8_t id, uint8_t data)
-{
-  uint8_t chsum = (id ^ data ^ (data >> 4) ^ 0b0011) & 0b1111;
-  uint16_t m = ((id) << 12) | (chsum << 8) | (data);
-  return m;
-}
-
 void beginReceiveArray(uint8_t maxBytes, uint8_t *data)
 {
   MANRX_BeginReceiveBytes(maxBytes, data);
@@ -217,15 +196,11 @@ uint8_t receiveComplete(void)
   return MANRX_ReceiveComplete();
 }
 
-void stopReceive(void)
-{
-  MANRX_StopReceive();
-}
-
 //global functions
 
 void MANRX_SetupReceive(uint8_t speedFactor)
 {
+// may be optional
   DDRB &= ~(RxPin);
   /*
   Timer 1 is used with a ATtiny85.
@@ -262,20 +237,15 @@ void MANRX_BeginReceiveBytes(uint8_t maxBytes, uint8_t *data)
   rx_mode = RX_MODE_PRE;
 }
 
-void MANRX_StopReceive(void)
-{
-  rx_mode = RX_MODE_IDLE;
-}
-
 uint8_t MANRX_ReceiveComplete(void)
 {
   return (rx_mode == RX_MODE_MSG);
 }
 
-void AddManBit(uint16_t *manBits, uint8_t *numMB,
-               uint8_t *curByte, uint8_t *data,
-               uint8_t bit)
-{
+void AddManBit(uint16_t *manBits, 
+								uint8_t *numMB,
+								uint8_t *curByte, uint8_t *data,
+								uint8_t bit ){
   *manBits <<= 1;
   *manBits |= bit;
   (*numMB)++;

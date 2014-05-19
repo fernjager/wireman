@@ -113,9 +113,8 @@ void setupTransmit(Manchester *man, uint8_t pin, uint8_t SF); //set up transmiss
 void setupReceive(Manchester *man, uint8_t pin, uint8_t SF); //set up receiver
 void setup(Manchester *man, uint8_t Tpin, uint8_t Rpin, uint8_t SF); //set up receiver
     
-void transmit(Manchester *man, uint16_t data); //transmit 16 bits of data
 void transmitArray(Manchester *man, uint8_t numBytes, uint8_t *data); // transmit array of bytes
-    
+ 
 uint8_t decodeMessage(uint16_t m, uint8_t *id, uint8_t *data); //decode 8 bit payload and 4 bit ID from the message, return 1 of checksum is correct, otherwise 0
 uint16_t encodeMessage(uint8_t id, uint8_t data); //encode 8 bit payload, 4 bit ID and 4 bit checksum into 16 bit
     
@@ -123,7 +122,7 @@ uint16_t encodeMessage(uint8_t id, uint8_t data); //encode 8 bit payload, 4 bit 
 void beginReceive(void);
 void beginReceiveArray(uint8_t maxBytes, uint8_t *data);
 uint8_t receiveComplete(void);
-uint16_t getMessage(void);
+
 void stopReceive(void);
     
 void sendZero(Manchester *man);
@@ -135,9 +134,6 @@ extern void MANRX_SetRxPin(uint8_t pin);
 //begin the timer used to receive data
 extern void MANRX_SetupReceive(uint8_t speedFactor);
     
-// begin receiving 16 bits
-extern void MANRX_BeginReceive(void);
-    
 // begin receiving a byte array
 extern void MANRX_BeginReceiveBytes(uint8_t maxBytes, uint8_t *data);
     
@@ -146,8 +142,6 @@ extern uint8_t MANRX_ReceiveComplete(void);
     
 // fetch the received message
 extern uint16_t MANRX_GetMessage(void);
-    
-// stop receiving data
-extern void MANRX_StopReceive(void);
+ 
 
 #endif

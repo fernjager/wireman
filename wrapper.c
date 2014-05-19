@@ -1,11 +1,11 @@
-
-
 #include <avr/io.h>
 #include <inttypes.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <string.h>
+
 #include "manchester.h"
+
 void init(Manchester * man, uint8_t address){
   man->addr = address;
 }
